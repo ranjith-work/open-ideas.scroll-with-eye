@@ -1,0 +1,14 @@
+{
+  "name": "scroll-with-eye",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A drop-in page script that scrolls with your eyes and selects a section on a double blink.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

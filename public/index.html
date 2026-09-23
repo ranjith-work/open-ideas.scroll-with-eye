@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scroll with your eyes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/demo.css">
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="wordmark">Scroll-With-Eye</div>
+      <div>Camera stays on this machine</div>
+    </header>
+
+    <h1>The page moves when you look away.</h1>
+    <p class="lede">Press Start in the corner. Look toward an edge to scroll. Double-blink while the outline is on a section, and that section takes over.</p>
+
+    <ol class="steps">
+      <li><span>01</span>Start opens the camera. Look at the middle of the screen until the ring lets go of the center.</li>
+      <li><span>02</span>That look stays still. Looking up, down, left, or right from it scrolls that way.</li>
+      <li><span>03</span>A double blink selects the outlined section. Blink away from one to return to the page.</li>
+    </ol>
+
+    <h2>Field notes</h2>
+    <p class="note">This stretch is the page itself. Look down to move through it.</p>
+    <article>
+      <p>Most scrolling assumes a hand on a wheel, a trackpad, or a thumb. This page assumes a face. The camera watches the eyes, and the eyes decide whether the document or one box inside it should move.</p>
+      <p>A steady look at the middle does nothing. That dead zone is deliberate. People rest their gaze near the center of whatever they are reading, and a plugin that drifted on every small saccade would be unreadable. Movement starts only after the look leaves that rest zone, and it speeds up as the look goes further.</p>
+      <p>The lime ring is not a mouse. Webcam gaze is good at “which large region,” and poor at “which word.” Sections on this page are large on purpose. The ring shows the guess. The outline shows which section that guess has landed on.</p>
+      <p>Selection is a double blink, not a single one. Everyone blinks to wet their eyes. Treating that as a click would select things constantly. Two deliberate blinks, close together, are rare enough to mean “this one.”</p>
+      <p>Nothing in the video frame is uploaded. The tracker runs here, in the browser, after you allow the camera. Stop closes the camera. Refreshing the page does the same.</p>
+      <p>Keep going. The horizontal row and the board are the parts worth selecting. They scroll inside their own frames, including sideways, once a double blink makes one of them the target.</p>
+    </article>
+
+    <h2>Card row</h2>
+    <p class="note">A sideways section. Double-blink it, then look left and right.</p>
+    <section class="strip" data-eye-section="Card row" aria-label="Card row"></section>
+
+    <article>
+      <p>After the row, the page is in charge again until you pick something else. Look down to reach the board. If the ring is sitting on empty page rather than an outline, a double blink hands scrolling back to the document.</p>
+      <p>The board is wider and taller than its frame. Selecting it lets one look move both axes. The marked cells — A1, F4, and L7 — are there so you can tell whether you travelled.</p>
+    </article>
+
+    <h2>Board</h2>
+    <p class="note">Overflows both ways. Select it, then look toward the corners of the screen.</p>
+    <section class="board" data-eye-section="Board" aria-label="Board">
+      <div class="board-canvas"></div>
+    </section>
+
+    <article>
+      <h2>After the board</h2>
+      <p>There is more page below the board so a downward look still has somewhere to go once you are back on the document. If a section was left selected, look at a gap and double-blink. The label in the panel should say Scrolling Page.</p>
+      <p>Sensitivity, on the panel, only changes how fast a look scrolls. It does not move the ring. A light look should creep. A look toward the bezel should travel.</p>
+      <p>If the camera light is on and the status says no face, sit a little further back or raise the lamp. The tracker needs both eyes. A wink does not count as a blink, because both eyes have to close.</p>
+      <p>This is the bottom of the demo. Look up to climb back to the title, or stop the camera and read it the ordinary way.</p>
+    </article>
+
+    <footer>Drop the same script into another page. Mark any overflow box with data-eye-section.</footer>
+  </div>
+  <script type="module" src="/demo.js"></script>
+</body>
+</html>

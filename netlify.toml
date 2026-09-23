@@ -1,0 +1,3 @@
+[build]
+  command = "mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin"
+  publish = "dist"

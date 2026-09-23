@@ -1,6 +1,11 @@
 [build]
-  command = "node scripts/fetch-vendor.mjs public/vendor/mediapipe && mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin"
+  command = "mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin && node scripts/fetch-vendor.mjs dist/vendor/mediapipe || echo 'vendor fetch skipped — CDN fallback will be used'"
   publish = "dist"
+
+[[headers]]
+  for = "/plugin/*"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/*"

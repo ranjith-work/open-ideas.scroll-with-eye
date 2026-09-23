@@ -37,8 +37,13 @@ async function download(url, dest) {
   console.log(`  got  ${dest}`);
 }
 
-console.log(`Fetching MediaPipe assets → ${OUT}`);
-for (const [rel, url] of FILES) {
-  await download(url, join(OUT, rel));
+try {
+  console.log(`Fetching MediaPipe assets → ${OUT}`);
+  for (const [rel, url] of FILES) {
+    await download(url, join(OUT, rel));
+  }
+  console.log('Done.');
+} catch (err) {
+  console.warn('Vendor fetch failed (CDN fallback will be used):', err.message || err);
+  if (!process.env.NETLIFY) process.exit(1);
 }
-console.log('Done.');

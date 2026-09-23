@@ -1,5 +1,7 @@
 [build]
-  command = "mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin && node scripts/fetch-vendor.mjs dist/vendor/mediapipe || echo 'vendor fetch skipped — CDN fallback will be used'"
+  # Put the plugin next to the demo pages, then publish that tree. Avoids a
+  # Netlify UI "publish directory" mismatch leaving an old /plugin on the CDN.
+  command = "rm -rf public/plugin && cp -R plugin public/plugin && mkdir -p dist && rm -rf dist/* && cp -R public/. dist/ && (node scripts/fetch-vendor.mjs dist/vendor/mediapipe || true)"
   publish = "dist"
 
 [[headers]]

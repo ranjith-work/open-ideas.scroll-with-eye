@@ -6,12 +6,20 @@ import {
   asScoreMap,
   averageGaze,
   gazeFromLandmarks,
-  offsetGaze,
   reticleFromGaze,
   smoothGaze,
   velocityFromGaze,
 } from './gaze.js';
 import { measureSections, sectionAtPoint, sectionLabel } from './sections.js';
+
+// Kept here (not only in gaze.js) so a stale CDN/edge copy of gaze.js cannot
+ // break the module graph with a missing export.
+function offsetGaze(gaze, baseline) {
+  return {
+    x: (gaze?.x || 0) - (baseline?.x || 0),
+    y: (gaze?.y || 0) - (baseline?.y || 0),
+  };
+}
 
 const CALIBRATION_MS = 1000;
 const CALIBRATION_WARMUP_MS = 300;

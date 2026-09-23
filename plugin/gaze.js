@@ -84,6 +84,14 @@ export function averageGaze(samples) {
   return { x: x / samples.length, y: y / samples.length };
 }
 
+/** Gaze relative to a calibrated center look. */
+export function offsetGaze(gaze, baseline) {
+  return {
+    x: (gaze?.x || 0) - (baseline?.x || 0),
+    y: (gaze?.y || 0) - (baseline?.y || 0),
+  };
+}
+
 export function smoothGaze(previous, next, dtMs, halfLifeMs = 90) {
   if (!previous || !(dtMs > 0)) return { x: next.x, y: next.y };
   const alpha = 1 - Math.exp(-dtMs / halfLifeMs);

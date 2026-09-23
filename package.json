@@ -5,6 +5,7 @@
   "type": "module",
   "description": "A drop-in page script that scrolls with your eyes and selects a section on a double blink.",
   "scripts": {
+    "vendor": "node scripts/fetch-vendor.mjs",
     "start": "node server.js",
     "test": "node --test test/*.test.js"
   },

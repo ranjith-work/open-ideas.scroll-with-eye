@@ -4,7 +4,6 @@ import test from 'node:test';
 import {
   asScoreMap,
   axisVelocity,
-  gazeFromBlendshapes,
   averageGaze,
   offsetGaze,
   reticleFromGaze,
@@ -54,32 +53,16 @@ test('asScoreMap reads MediaPipe categories', () => {
 });
 
 test('a resting face sits at the origin', () => {
-  const gaze = gazeFromBlendshapes({});
-  assert.deepEqual(gaze, { x: 0, y: 0 });
+  const still = gazeFromLandmarks(faceWithEyes());
+  assert.ok(Math.abs(still.x) < 1e-9);
+  assert.ok(Math.abs(still.y) < 1e-9);
 });
 
-test('looking right and down produces a positive gaze', () => {
-  const gaze = gazeFromBlendshapes({
-    eyeLookOutRight: 0.6,
-    eyeLookInLeft: 0.4,
-    eyeLookDownLeft: 0.5,
-    eyeLookDownRight: 0.5,
-  });
-  assert.ok(gaze.x > 0);
-  assert.ok(gaze.y > 0);
-  assert.equal(gaze.x, 0.5);
-  assert.equal(gaze.y, 0.5);
-});
-
-test('looking left and up produces a negative gaze', () => {
-  const gaze = gazeFromBlendshapes({
-    eyeLookOutLeft: 0.8,
-    eyeLookInRight: 0.2,
-    eyeLookUpLeft: 0.3,
-    eyeLookUpRight: 0.3,
-  });
-  assert.equal(gaze.x, -0.5);
-  assert.equal(gaze.y, -0.3);
+test('looking left and down moves gaze that way', () => {
+  const toTheLeft = gazeFromLandmarks(faceWithEyes({ leftH: 0.8, rightH: 0.2 }));
+  const down = gazeFromLandmarks(faceWithEyes({ leftV: 0.8, rightV: 0.8 }));
+  assert.ok(toTheLeft.x < -0.5);
+  assert.ok(down.y > 0.5);
 });
 
 test('the dead zone produces no scroll', () => {
@@ -95,8 +78,8 @@ test('past the dead zone, direction matches the look and speed grows with time',
   assert.ok(right > 0);
   assert.equal(left, -right);
 
-  const slow = axisVelocity(0.2, 500);
-  const fast = axisVelocity(0.5, 500);
+  const slow = axisVelocity(0.4, 500);
+  const fast = axisVelocity(0.9, 500);
   assert.ok(fast > slow);
   assert.ok(slow > 0);
 

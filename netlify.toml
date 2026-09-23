@@ -1,3 +1,8 @@
 [build]
-  command = "mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin"
+  command = "node scripts/fetch-vendor.mjs public/vendor/mediapipe && mkdir -p dist && cp -R public/. dist/ && cp -R plugin dist/plugin"
   publish = "dist"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Permissions-Policy = "camera=(self)"

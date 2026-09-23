@@ -17,10 +17,50 @@ const CALIBRATION_MS = 1000;
 const CALIBRATION_WARMUP_MS = 300;
 const CALIBRATION_MIN = 8;
 
+// Prefer same-origin copies (Netlify / `npm run vendor`). Fall back to the CDN
+// only when those files are missing, so a local `npm start` still works before
+// the first vendor fetch.
 const VISION_VERSION = '0.10.17';
-const VISION_MODULE = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}/vision_bundle.mjs`;
-const VISION_WASM = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}/wasm`;
-const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+const LOCAL_VISION_MODULE = '/vendor/mediapipe/vision_bundle.mjs';
+const LOCAL_VISION_WASM = '/vendor/mediapipe/wasm';
+const LOCAL_MODEL_URL = '/vendor/mediapipe/face_landmarker.task';
+const CDN_VISION_MODULE = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}/vision_bundle.mjs`;
+const CDN_VISION_WASM = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${VISION_VERSION}/wasm`;
+const CDN_MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task';
+
+async function createLandmarkerFrom(moduleUrl, wasmUrl, modelUrl) {
+  const vision = await import(moduleUrl);
+  const fileset = await vision.FilesetResolver.forVisionTasks(wasmUrl);
+  const options = {
+    baseOptions: { modelAssetPath: modelUrl },
+    outputFaceBlendshapes: true,
+    runningMode: 'VIDEO',
+    numFaces: 1,
+  };
+  try {
+    return await vision.FaceLandmarker.createFromOptions(fileset, {
+      ...options,
+      baseOptions: { ...options.baseOptions, delegate: 'GPU' },
+    });
+  } catch {
+    return vision.FaceLandmarker.createFromOptions(fileset, {
+      ...options,
+      baseOptions: { ...options.baseOptions, delegate: 'CPU' },
+    });
+  }
+}
+
+async function createLandmarker() {
+  try {
+    const probe = await fetch(LOCAL_VISION_MODULE, { method: 'HEAD' });
+    if (probe.ok) {
+      return createLandmarkerFrom(LOCAL_VISION_MODULE, LOCAL_VISION_WASM, LOCAL_MODEL_URL);
+    }
+  } catch {
+    /* fall through to CDN */
+  }
+  return createLandmarkerFrom(CDN_VISION_MODULE, CDN_VISION_WASM, CDN_MODEL_URL);
+}
 
 const STYLE = `
 .eye-scroll-panel {
@@ -131,28 +171,6 @@ function el(tag, className, text) {
   if (className) node.className = className;
   if (text) node.textContent = text;
   return node;
-}
-
-async function createLandmarker() {
-  const vision = await import(VISION_MODULE);
-  const fileset = await vision.FilesetResolver.forVisionTasks(VISION_WASM);
-  const options = {
-    baseOptions: { modelAssetPath: MODEL_URL },
-    outputFaceBlendshapes: true,
-    runningMode: 'VIDEO',
-    numFaces: 1,
-  };
-  try {
-    return await vision.FaceLandmarker.createFromOptions(fileset, {
-      ...options,
-      baseOptions: { ...options.baseOptions, delegate: 'GPU' },
-    });
-  } catch {
-    return vision.FaceLandmarker.createFromOptions(fileset, {
-      ...options,
-      baseOptions: { ...options.baseOptions, delegate: 'CPU' },
-    });
-  }
 }
 
 function createSession(options) {
@@ -423,7 +441,11 @@ function createSession(options) {
       const name = err?.name;
       if (name === 'NotAllowedError' || name === 'SecurityError') setStatus('Camera permission was blocked');
       else if (name === 'NotFoundError' || name === 'NotReadableError') setStatus('No camera was found');
-      else setStatus('Could not start the eye tracker');
+      else {
+        const detail = String(err?.message || err || '').slice(0, 120);
+        setStatus(detail ? `Eye tracker failed: ${detail}` : 'Could not start the eye tracker');
+        console.error('[Scroll-With-Eye]', err);
+      }
     }
   }
 
